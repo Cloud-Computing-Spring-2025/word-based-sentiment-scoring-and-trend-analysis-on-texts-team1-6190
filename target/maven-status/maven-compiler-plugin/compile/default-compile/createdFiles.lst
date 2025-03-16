@@ -1,0 +1,4 @@
+com/project/BookMapper$BookMetadataKey.class
+com/project/BookReducer.class
+com/project/driver/BookDataCleaner.class
+com/project/BookMapper.class
