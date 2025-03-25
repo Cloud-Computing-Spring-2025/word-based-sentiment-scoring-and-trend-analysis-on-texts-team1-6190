@@ -25,24 +25,23 @@ docker compose up -d
 This command initializes the Hadoop ecosystem using Docker.
 
 #### **2. Compile Java Files and Create a JAR**
-Before running the MapReduce job, compile the Java source files and package them into a JAR file:
+Copy the JAR file to your Hadoop environment:
 ```sh
-javac -classpath $(hadoop classpath) -d /Task1/classes *.java
-jar -cvf preprocessing.jar -C /Task1/classes/ .
+mvn install
+scp target/historical-text-sentiment-analysis-1.0.jar user@hadoop-master:/path/to/jars/
 ```
 
 #### **3. Copy Input Data to HDFS**
 ```sh
-hdfs dfs -mkdir -p /user/root/input
-hdfs dfs -mkdir -p /user/root/jars
-hdfs dfs -put /Task1/preprocessing.jar /user/root/jars/
-hdfs dfs -put /workspaces/word-based-sentiment-scoring-and-trend-analysis-on-texts-skybound-team-8/inputs/* /user/root/input/
+hadoop fs -mkdir -p /input/dataset
+hadoop fs -put .//input/my_file.csv /input/dataset/
 ```
 This uploads the dataset and the JAR file into Hadoop's distributed file system.
 
 #### **4. Run the MapReduce Job**
 ```sh
-hadoop jar /user/root/jars/preprocessing.jar PreprocessingDriver /user/root/input /user/root/output
+hadoop jar /opt/hadoop-3.2.1/share/hadoop/mapreduce/DataCleaningMapReduce-1.0-SNAPSHOT.jar com.project.driver.BookPreprocessingDriver \
+  /input/dataset/my_file.csv /output
 ```
 This processes the input text and generates the cleaned dataset.
 
@@ -60,8 +59,9 @@ This command displays the processed output.
 
 #### **7. Copy Output to Local System**
 ```sh
-docker cp namenode:/user/root/output /workspaces/word-based-sentiment-scoring-and-trend-analysis-on-texts-skybound-team-8/output/task1
-docker cp namenode:/tmp/preprocessing.jar /workspaces/word-based-sentiment-scoring-and-trend-analysis-on-texts-skybound-team-8/output/task1/
+hadoop fs -cat /output/*
+hdfs dfs -get /output /opt/hadoop-3.2.1/share/hadoop/mapreduce/
+
 ```
 This retrieves the output from HDFS to the local filesystem for further analysis.
 
