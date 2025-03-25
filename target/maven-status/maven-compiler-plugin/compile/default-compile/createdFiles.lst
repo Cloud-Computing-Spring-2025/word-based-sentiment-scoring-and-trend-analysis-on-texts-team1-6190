@@ -1,4 +1,8 @@
-com/project/BookMapper$BookMetadataKey.class
+com/project/driver/WordFrequencyAnalyzer.class
+com/project/LemmaFrequencyReducer.class
 com/project/BookReducer.class
+com/project/LemmaFrequencyMapper$LemmaKey.class
+com/project/BookMapper$BookMetadataKey.class
+com/project/LemmaFrequencyMapper.class
 com/project/driver/BookDataCleaner.class
 com/project/BookMapper.class
