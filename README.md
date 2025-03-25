@@ -443,5 +443,81 @@ docker cp resourcemanager:/opt/hadoop-3.2.1/share/hadoop/mapreduce/output4/ task
 
 ### Note:
 We've used the same XML file for Task 2, Task 3, and Task 4, specifying the appropriate class name for each task within the file.
+### TASK 5
+Step 1: Copy Files into Hive Server
 
+Start your Hive server using Docker and copy the necessary files (in this case, BigramUDF.java).
+
+docker compose up -d
+docker cp BigramUDF.java hive-server:/opt/hive
+
+Step 2: Access the Hive Server
+
+Log into the Hive container to access the Hive environment.
+
+docker exec -it hive-server /bin/bash
+
+Step 3: Upload Files to HDFS
+
+Navigate to the /opt/hive directory inside the container and upload the BigramUDF.java file to HDFS.
+
+cd /opt/hive
+hdfs dfs -put BigramUDF.java /user/hive/warehouse
+
+Step 4: Compile Java UDF
+
+Compile the Java file. Ensure the classpath is correctly set for your system's Hadoop and Hive paths.
+
+javac -cp "/etc/hadoop:/opt/hadoop-2.7.4/share/hadoop/common/lib/:/opt/hadoop-2.7.4/share/hadoop/common/:/opt/hadoop-2.7.4/hadoop/hdfs:/opt/hadoop-2.7.4/share/hadoop/hdfs/lib/:/opt/hadoop-2.7.4/share/hadoop/hdfs/:/opt/hadoop-2.7.4/share/hadoop/yarn/lib/:/opt/hadoop-2.7.4/share/hadoop/yarn/:/opt/hadoop-2.7.4/share/hadoop/mapreduce/lib/:/opt/hadoop-2.7.4/share/hadoop/mapreduce/:/opt/hive/lib/*" -d . BigramUDF.java
+
+Step 5: Package into a JAR
+
+Create a JAR file from the compiled Java class for the UDF.
+
+jar -cvf bigram_udf.jar BigramUDF.class
+
+Step 6: Start Hive CLI
+
+Launch the Hive command-line interface to interact with the Hive environment.
+
+hive
+
+Step 7: Register UDF in Hive
+
+Register the UDF in Hive by adding the JAR and creating a temporary function for Bigram counting.
+
+ADD JAR /opt/hive/bigram_udf.jar;
+CREATE TEMPORARY FUNCTION bigram_count AS 'BigramUDF';
+
+Step 8: Create and Load Data into Hive Tables
+
+Create a table to store the lemmatized data:
+
+CREATE TABLE lemma_data (
+  book_name STRING,
+  lemma_word STRING,
+  year INT,
+  count INT
+)
+ROW FORMAT DELIMITED 
+FIELDS TERMINATED BY ',';
+
+Then, load your data into the table from the specified path (ensure the files are placed correctly in the HDFS location):
+
+LOAD DATA INPATH '/user/hive/inputs/*' OVERWRITE INTO TABLE lemma_data;
+
+Step 9: Aggregate Lemmatized Data
+
+After loading the data, create an aggregated table to group lemmatized words and their counts:
+
+CREATE TABLE book_lemma AS
+SELECT book_name, year, 
+       collect_list(lemma_word) AS lemma_words,
+       collect_list(count) AS count_values
+FROM lemma_data
+GROUP BY book_name, year;
+
+Step 10: Run the UDF to Extract Bigrams
+
+Finally, use the registered UDF (bigram_count) to extract bigrams (two-word combinations) from the lemma_words:
 
