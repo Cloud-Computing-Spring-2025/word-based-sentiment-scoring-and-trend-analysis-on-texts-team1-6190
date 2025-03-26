@@ -1,9 +1,12 @@
+com/project/task4/BookYearMapper.class
 com/project/task2/TermAnalysisEngine.class
 com/project/task1/BookReducer.class
 com/project/task2/TermExtractionMapper.class
+com/project/task4/DecadeSumReducer.class
 com/project/task2/TermCountReducer.class
 com/project/task1/BookMapper.class
 com/project/task3/SentimentMapper.class
 com/project/task3/SentimentAnalysisDriver.class
 com/project/task1/BookDataCleaner.class
 com/project/task3/SentimentReducer.class
+com/project/task4/DecadeProcessor.class

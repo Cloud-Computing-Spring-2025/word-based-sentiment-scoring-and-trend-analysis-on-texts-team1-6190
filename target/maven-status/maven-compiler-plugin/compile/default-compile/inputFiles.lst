@@ -1,9 +1,12 @@
 /workspaces/word-based-sentiment-scoring-and-trend-analysis-on-texts-team1-6190/src/main/java/com/project/task2/TermExtractionMapper.java
+/workspaces/word-based-sentiment-scoring-and-trend-analysis-on-texts-team1-6190/src/main/java/com/project/task4/BookYearMapper.java
 /workspaces/word-based-sentiment-scoring-and-trend-analysis-on-texts-team1-6190/src/main/java/com/project/task3/SentimentReducer.java
+/workspaces/word-based-sentiment-scoring-and-trend-analysis-on-texts-team1-6190/src/main/java/com/project/task4/DecadeSumReducer.java
 /workspaces/word-based-sentiment-scoring-and-trend-analysis-on-texts-team1-6190/src/main/java/com/project/task2/TermAnalysisEngine.java
 /workspaces/word-based-sentiment-scoring-and-trend-analysis-on-texts-team1-6190/src/main/java/com/project/task1/BookReducer.java
 /workspaces/word-based-sentiment-scoring-and-trend-analysis-on-texts-team1-6190/src/main/java/com/project/task3/SentimentAnalysisDriver.java
 /workspaces/word-based-sentiment-scoring-and-trend-analysis-on-texts-team1-6190/src/main/java/com/project/task2/TermCountReducer.java
 /workspaces/word-based-sentiment-scoring-and-trend-analysis-on-texts-team1-6190/src/main/java/com/project/task1/BookDataCleaner.java
+/workspaces/word-based-sentiment-scoring-and-trend-analysis-on-texts-team1-6190/src/main/java/com/project/task4/DecadeProcessor.java
 /workspaces/word-based-sentiment-scoring-and-trend-analysis-on-texts-team1-6190/src/main/java/com/project/task3/SentimentMapper.java
 /workspaces/word-based-sentiment-scoring-and-trend-analysis-on-texts-team1-6190/src/main/java/com/project/task1/BookMapper.java
