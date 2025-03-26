@@ -446,53 +446,130 @@ We've used the same XML file for Task 2, Task 3, and Task 4, specifying the appr
 ### TASK 5
 Step 1: Copy Files into Hive Server
 
-Start your Hive server using Docker and copy the necessary files (in this case, BigramUDF.java).
+Certainly! Here's the updated README with the additional code you requested:
 
+---
+
+# Task 5: Bigram Analysis Using Hive UDF
+
+## Objective
+
+The goal of this task is to extract and analyze bigrams (two-word combinations) from lemmatized text data using a custom Hive UDF (User-Defined Function). This process involves the following steps:
+1. **Uploading the UDF (BigramUDF.java) into the Hive server.**
+2. **Compiling the UDF and packaging it into a JAR file.**
+3. **Registering the UDF in Hive.**
+4. **Creating tables to store and process the data.**
+5. **Running the bigram analysis and storing the results in HDFS.**
+
+---
+
+## Prerequisites
+
+Before running the following steps, ensure that:
+- **Hive** is installed and configured properly on your system or cluster.
+- **Hadoop** is correctly set up for HDFS operations.
+- The **BigramUDF.java** file is available on your local system.
+
+---
+
+## Steps for Task 5
+
+### **Step 1: Copy Files into Hive Server**
+
+Start your Hive server using Docker and copy the necessary files (in this case, `BigramUDF.java`) into the Hive container.
+
+```sh
 docker compose up -d
 docker cp BigramUDF.java hive-server:/opt/hive
+```
 
-Step 2: Access the Hive Server
+This command starts the Hive server in detached mode and copies the `BigramUDF.java` file into the `/opt/hive` directory inside the container.
+
+---
+
+### **Step 2: Access the Hive Server**
 
 Log into the Hive container to access the Hive environment.
 
+```sh
 docker exec -it hive-server /bin/bash
+```
 
-Step 3: Upload Files to HDFS
+This command will open a terminal session inside the Hive server container.
 
-Navigate to the /opt/hive directory inside the container and upload the BigramUDF.java file to HDFS.
+---
 
+### **Step 3: Upload Files to HDFS**
+
+Navigate to the `/opt/hive` directory inside the container and upload the `BigramUDF.java` file to HDFS.
+
+```sh
 cd /opt/hive
 hdfs dfs -put BigramUDF.java /user/hive/warehouse
+```
 
-Step 4: Compile Java UDF
+This command uploads the `BigramUDF.java` file to HDFS, making it available for compilation and usage.
 
-Compile the Java file. Ensure the classpath is correctly set for your system's Hadoop and Hive paths.
+---
 
+### **Step 4: Compile Java UDF**
+
+Next, compile the `BigramUDF.java` file using the `javac` compiler. Ensure the classpath is set correctly for your system’s Hadoop and Hive paths.
+
+```sh
 javac -cp "/etc/hadoop:/opt/hadoop-2.7.4/share/hadoop/common/lib/:/opt/hadoop-2.7.4/share/hadoop/common/:/opt/hadoop-2.7.4/hadoop/hdfs:/opt/hadoop-2.7.4/share/hadoop/hdfs/lib/:/opt/hadoop-2.7.4/share/hadoop/hdfs/:/opt/hadoop-2.7.4/share/hadoop/yarn/lib/:/opt/hadoop-2.7.4/share/hadoop/yarn/:/opt/hadoop-2.7.4/share/hadoop/mapreduce/lib/:/opt/hadoop-2.7.4/share/hadoop/mapreduce/:/opt/hive/lib/*" -d . BigramUDF.java
+```
 
-Step 5: Package into a JAR
+This will compile the `BigramUDF.java` file and generate the corresponding `.class` files.
 
-Create a JAR file from the compiled Java class for the UDF.
+---
 
+### **Step 5: Package into a JAR**
+
+After compiling the Java file, create a JAR file from the compiled `.class` file for the UDF.
+
+```sh
 jar -cvf bigram_udf.jar BigramUDF.class
+```
 
-Step 6: Start Hive CLI
+This step packages the compiled class into a JAR file named `bigram_udf.jar`.
 
-Launch the Hive command-line interface to interact with the Hive environment.
+---
 
+### **Step 6: Start Hive CLI**
+
+Launch the Hive command-line interface (CLI) to interact with the Hive environment.
+
+```sh
 hive
+```
 
-Step 7: Register UDF in Hive
+This will open the Hive CLI, where you can run Hive commands and queries.
 
-Register the UDF in Hive by adding the JAR and creating a temporary function for Bigram counting.
+---
 
+### **Step 7: Register UDF in Hive**
+
+Once you're inside the Hive CLI, register the UDF by adding the JAR file and creating a temporary function for bigram counting.
+
+```sql
+-- Add the UDF JAR file to Hive
 ADD JAR /opt/hive/bigram_udf.jar;
+
+-- Register the custom Bigram UDF
 CREATE TEMPORARY FUNCTION bigram_count AS 'BigramUDF';
+```
 
-Step 8: Create and Load Data into Hive Tables
+This step ensures that the `BigramUDF` is available to Hive for use in queries.
 
-Create a table to store the lemmatized data:
+---
 
+### **Step 8: Create and Load Data into Hive Tables**
+
+Create a table to store the lemmatized data. This table will hold information about the lemmatized words, their frequencies, and associated metadata (like book name and publication year).
+
+```sql
+-- Create the table to store lemmatized data
 CREATE TABLE lemma_data (
   book_name STRING,
   lemma_word STRING,
@@ -501,23 +578,176 @@ CREATE TABLE lemma_data (
 )
 ROW FORMAT DELIMITED 
 FIELDS TERMINATED BY ',';
+```
 
-Then, load your data into the table from the specified path (ensure the files are placed correctly in the HDFS location):
+Then, load your data into the table from the specified HDFS path where the lemmatized files are stored.
 
+```sql
+-- Load data into the table from HDFS
 LOAD DATA INPATH '/user/hive/inputs/*' OVERWRITE INTO TABLE lemma_data;
+```
 
-Step 9: Aggregate Lemmatized Data
+This will load the lemmatized data from the HDFS path (`/user/hive/inputs/*`) into the `lemma_data` table.
 
-After loading the data, create an aggregated table to group lemmatized words and their counts:
+---
 
-CREATE TABLE book_lemma AS
-SELECT book_name, year, 
-       collect_list(lemma_word) AS lemma_words,
-       collect_list(count) AS count_values
+### **Step 9: Perform Bigram Analysis**
+
+Now, you can use the `bigram_count` function to analyze the bigrams from the `lemma_data` table. You can follow the example below to extract and analyze bigrams:
+
+```sql
+-- Drop the existing bigram output table if it exists
+DROP TABLE IF EXISTS bigram_output;
+
+-- Create the bigram output table
+CREATE TABLE bigram_output AS
+SELECT
+  book_name,
+  year,
+  bigram_count(lemma_word) AS bigram,  -- Use the UDF to extract bigrams
+  count
 FROM lemma_data
-GROUP BY book_name, year;
+GROUP BY book_name, year, lemma_word;
+```
 
-Step 10: Run the UDF to Extract Bigrams
+This will create a table called `bigram_output` containing the `book_name`, `year`, `bigram`, and their associated `count` values.
 
-Finally, use the registered UDF (bigram_count) to extract bigrams (two-word combinations) from the lemma_words:
+---
+. Most Frequent Bigrams Across All Books
+sql
+Copy
+Edit
+SELECT bigram, COUNT(*) AS total_frequency
+FROM lemmatized_books
+LATERAL VIEW explode(extract_bigrams(text)) exploded_table AS bigram
+WHERE
+  split(bigram, ' ')[0] NOT IN (
+    'the','and','a','of','in','is','to','that','with','as','on','for','by','at',
+    'from','was','are','this','but','his','her','who','which','what','all','no',
+    'he','she','it','you','i','we','said','do','does','did','be','been','being',
+    'have','has','had','s'
+  )
+  AND
+  split(bigram, ' ')[1] NOT IN (
+    'the','and','a','of','in','is','to','that','with','as','on','for','by','at',
+    'from','was','are','this','but','his','her','who','which','what','all','no',
+    'he','she','it','you','i','we','said','do','does','did','be','been','being',
+    'have','has','had','s'
+  )
+GROUP BY bigram
+ORDER BY total_frequency DESC
+LIMIT 50;
+In this query, we:
+
+Extracted bigrams using the LATERAL VIEW and the explode() function.
+
+Removed common stopwords like "the", "and", "is" from both the first and second words of the bigram to focus on meaningful combinations.
+
+Counted the occurrences of each bigram and ranked them by frequency, ensuring that we retrieve only the 50 most frequent bigrams across the entire dataset.
+
+2. Top 5 Bigrams per Book (Grouped by Book)
+sql
+Copy
+Edit
+INSERT OVERWRITE DIRECTORY '/user/hive/output/top_bigrams_per_book'
+ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
+SELECT book_id, bigram, frequency
+FROM (
+  SELECT book_id, bigram, frequency, ROW_NUMBER() OVER (PARTITION BY book_id ORDER BY frequency DESC) AS rank
+  FROM (
+    SELECT book_id, bigram, COUNT(*) AS frequency
+    FROM (
+      SELECT book_id, explode(extract_bigrams(text)) AS bigram
+      FROM lemmatized_books
+    ) raw
+    WHERE
+      split(bigram, ' ')[0] NOT IN (
+        'the','and','a','of','in','is','to','that','with','as','on','for','by','at',
+        'from','was','are','this','but','his','her','who','which','what','all','no',
+        'he','she','it','you','i','we','said','do','does','did','be','been','being',
+        'have','has','had','s'
+      )
+      AND
+      split(bigram, ' ')[1] NOT IN (
+        'the','and','a','of','in','is','to','that','with','as','on','for','by','at',
+        'from','was','are','this','but','his','her','who','which','what','all','no',
+        'he','she','it','you','i','we','said','do','does','did','be','been','being',
+        'have','has','had','s'
+      )
+    GROUP BY book_id, bigram
+  ) grouped
+) ranked
+WHERE rank <= 5;
+Here, we:
+
+Used the ROW_NUMBER() window function to rank bigrams within each book based on frequency.
+
+Filtered to return only the top 5 bigrams for each book, ensuring that no single book disproportionately affects the overall ranking.
+
+Stored the results in an output directory for further analysis.
+
+3. Top 5 Bigrams per Decade (Grouped by Decade)
+sql
+Copy
+Edit
+INSERT OVERWRITE DIRECTORY '/user/hive/output/top_bigrams_per_decade'
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '\t'
+SELECT decade, bigram, frequency
+FROM (
+  SELECT
+    decade,
+    bigram,
+    frequency,
+    ROW_NUMBER() OVER (PARTITION BY decade ORDER BY frequency DESC) AS rank
+  FROM (
+    SELECT
+      decade,
+      bigram,
+      COUNT(*) AS frequency
+    FROM (
+      SELECT
+        CONCAT(FLOOR(year / 10) * 10, 's') AS decade,
+        exploded_table.bigram AS bigram
+      FROM lemmatized_books
+      LATERAL VIEW explode(extract_bigrams(text)) exploded_table AS bigram
+    ) raw_bigrams
+    WHERE
+      split(bigram, ' ')[0] NOT IN (
+        'the','and','a','of','in','is','to','that','with','as','on','for','by','at',
+        'from','was','are','this','but','his','her','who','which','what','all','no',
+        'he','she','it','you','i','we','said','do','does','did','be','been','being',
+        'have','has','had','s'
+      )
+      AND
+      split(bigram, ' ')[1] NOT IN (
+        'the','and','a','of','in','is','to','that','with','as','on','for','by','at',
+        'from','was','are','this','but','his','her','who','which','what','all','no',
+        'he','she','it','you','i','we','said','do','does','did','be','been','being',
+        'have','has','had','s'
+      )
+    GROUP BY decade, bigram
+  ) ranked
+) final
+WHERE rank <= 5;
+For the decade-based analysis, we:
+
+Grouped the bigrams by decade by converting the year column to a decade format (e.g., 1800 → 1800s).
+
+Applied the same stopword filtering, bigram counting, and ranking methodology used in previous queries.
+
+Extracted the top 5 most frequent bigrams per decade to show trends over time.
+### **Step 10: Export Results to HDFS**
+
+Finally, export the bigram analysis results to HDFS for further processing or downstream analysis.
+
+```sql
+-- Export the bigram output to HDFS
+INSERT OVERWRITE DIRECTORY 'hdfs://namenode:8020/output/part-r-00000'
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ','
+SELECT book_name, year, bigram, count
+FROM bigram_output;
+```
+
 
