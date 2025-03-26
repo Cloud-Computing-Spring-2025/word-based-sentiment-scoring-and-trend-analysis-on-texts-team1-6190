@@ -1,6 +1,9 @@
-/workspaces/word-based-sentiment-scoring-and-trend-analysis-on-texts-team1-6190/src/main/java/com/project/BookMapper.java
-/workspaces/word-based-sentiment-scoring-and-trend-analysis-on-texts-team1-6190/src/main/java/com/project/BookReducer.java
-/workspaces/word-based-sentiment-scoring-and-trend-analysis-on-texts-team1-6190/src/main/java/com/project/LemmaFrequencyMapper.java
-/workspaces/word-based-sentiment-scoring-and-trend-analysis-on-texts-team1-6190/src/main/java/com/project/driver/WordFrequencyAnalyzer.java
-/workspaces/word-based-sentiment-scoring-and-trend-analysis-on-texts-team1-6190/src/main/java/com/project/driver/BookDataCleaner.java
-/workspaces/word-based-sentiment-scoring-and-trend-analysis-on-texts-team1-6190/src/main/java/com/project/LemmaFrequencyReducer.java
+/workspaces/word-based-sentiment-scoring-and-trend-analysis-on-texts-team1-6190/src/main/java/com/project/task2/TermExtractionMapper.java
+/workspaces/word-based-sentiment-scoring-and-trend-analysis-on-texts-team1-6190/src/main/java/com/project/task3/SentimentReducer.java
+/workspaces/word-based-sentiment-scoring-and-trend-analysis-on-texts-team1-6190/src/main/java/com/project/task2/TermAnalysisEngine.java
+/workspaces/word-based-sentiment-scoring-and-trend-analysis-on-texts-team1-6190/src/main/java/com/project/task1/BookReducer.java
+/workspaces/word-based-sentiment-scoring-and-trend-analysis-on-texts-team1-6190/src/main/java/com/project/task3/SentimentAnalysisDriver.java
+/workspaces/word-based-sentiment-scoring-and-trend-analysis-on-texts-team1-6190/src/main/java/com/project/task2/TermCountReducer.java
+/workspaces/word-based-sentiment-scoring-and-trend-analysis-on-texts-team1-6190/src/main/java/com/project/task1/BookDataCleaner.java
+/workspaces/word-based-sentiment-scoring-and-trend-analysis-on-texts-team1-6190/src/main/java/com/project/task3/SentimentMapper.java
+/workspaces/word-based-sentiment-scoring-and-trend-analysis-on-texts-team1-6190/src/main/java/com/project/task1/BookMapper.java
