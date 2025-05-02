@@ -615,8 +615,7 @@ This will create a table called `bigram_output` containing the `book_name`, `yea
 ---
 . Most Frequent Bigrams Across All Books
 sql
-Copy
-Edit
+```sh
 SELECT bigram, COUNT(*) AS total_frequency
 FROM lemmatized_books
 LATERAL VIEW explode(extract_bigrams(text)) exploded_table AS bigram
@@ -637,6 +636,7 @@ WHERE
 GROUP BY bigram
 ORDER BY total_frequency DESC
 LIMIT 50;
+```
 In this query, we:
 
 Extracted bigrams using the LATERAL VIEW and the explode() function.
@@ -646,9 +646,7 @@ Removed common stopwords like "the", "and", "is" from both the first and second 
 Counted the occurrences of each bigram and ranked them by frequency, ensuring that we retrieve only the 50 most frequent bigrams across the entire dataset.
 
 2. Top 5 Bigrams per Book (Grouped by Book)
-sql
-Copy
-Edit
+```sh
 INSERT OVERWRITE DIRECTORY '/user/hive/output/top_bigrams_per_book'
 ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
 SELECT book_id, bigram, frequency
@@ -678,6 +676,7 @@ FROM (
   ) grouped
 ) ranked
 WHERE rank <= 5;
+```
 Here, we:
 
 Used the ROW_NUMBER() window function to rank bigrams within each book based on frequency.
@@ -688,8 +687,7 @@ Stored the results in an output directory for further analysis.
 
 3. Top 5 Bigrams per Decade (Grouped by Decade)
 sql
-Copy
-Edit
+```sh
 INSERT OVERWRITE DIRECTORY '/user/hive/output/top_bigrams_per_decade'
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '\t'
@@ -730,6 +728,7 @@ FROM (
   ) ranked
 ) final
 WHERE rank <= 5;
+```
 For the decade-based analysis, we:
 
 Grouped the bigrams by decade by converting the year column to a decade format (e.g., 1800 → 1800s).
